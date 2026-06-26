@@ -1,0 +1,85 @@
+name: Build Fabric Mod
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build usable mod jar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Validate project root
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f "build.gradle" ]; then
+            echo "::error::build.gradle was not found at the repository root. Upload the unzipped project contents, not an extra parent folder."
+            exit 1
+          fi
+          if [ ! -f "settings.gradle" ]; then
+            echo "::error::settings.gradle was not found at the repository root."
+            exit 1
+          fi
+          if [ ! -f "gradle.properties" ]; then
+            echo "::error::gradle.properties was not found at the repository root."
+            exit 1
+          fi
+          if [ ! -d "src" ]; then
+            echo "::error::src folder was not found at the repository root."
+            exit 1
+          fi
+          if [ ! -f ".github/workflows/build.yml" ]; then
+            echo "::error::.github/workflows/build.yml is missing. The hidden .github folder may not have uploaded correctly."
+            exit 1
+          fi
+          echo "Project root looks valid."
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.12.1'
+          cache-provider: basic
+
+      - name: Build with Gradle
+        run: gradle --no-daemon build
+
+      - name: Collect usable mod jar
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          mapfile -t jars < <(find build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-sources.jar" ! -name "*-dev.jar" | sort)
+          if [ "${#jars[@]}" -eq 0 ]; then
+            echo "::error::No usable mod jar was found in build/libs."
+            echo "Files in build/libs:"
+            find build/libs -maxdepth 1 -type f -print || true
+            exit 1
+          fi
+          cp "${jars[0]}" dist/
+          echo "Collected final jar:"
+          ls -la dist
+
+      - name: Upload built mod jar
+        uses: actions/upload-artifact@v6
+        with:
+          name: speedster-pathwalk-built-mod-jar
+          path: dist/*.jar
+          if-no-files-found: error
+          retention-days: 30
