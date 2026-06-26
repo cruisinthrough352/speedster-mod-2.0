@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    // Do not set RepositoriesMode.FAIL_ON_PROJECT_REPOS here.
+    // Fabric Loom adds an internal local repository named LoomLocalRemappedMods.
+    // Rejecting plugin-added project repositories makes the build fail before compilation.
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'speedster-pathwalk'

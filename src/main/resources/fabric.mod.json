@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "speedster_pathwalk",
+  "version": "${version}",
+  "name": "Speedster Pathwalk",
+  "description": "A Fabric 1.20.1 proof-of-concept mod that finds a path to coordinates and moves the player along it with fixed 5x time-compressed server-side path travel.",
+  "authors": [
+    "Generated project scaffold"
+  ],
+  "contact": {
+    "sources": "https://github.com/your-name/speedster-pathwalk"
+  },
+  "license": "MIT",
+  "icon": "assets/speedster_pathwalk/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.speedsterpathwalk.SpeedsterPathwalkMod"
+    ],
+    "client": [
+      "com.example.speedsterpathwalk.SpeedsterPathwalkClient"
+    ]
+  },
+  "mixins": [
+    "speedster_pathwalk.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
